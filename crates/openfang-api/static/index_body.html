@@ -23,19 +23,25 @@
           </div>
         </div>
       </div>
-      <div class="theme-switcher">
-        <button class="theme-opt" :class="{ active: themeMode === 'light' }" @click="setTheme('light')" title="Light">&#9788;</button>
-        <button class="theme-opt" :class="{ active: themeMode === 'system' }" @click="setTheme('system')" title="System">&#9675;</button>
-        <button class="theme-opt" :class="{ active: themeMode === 'dark' }" @click="setTheme('dark')" title="Dark">&#9790;</button>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="theme-switcher">
+          <button class="theme-opt" :class="{ active: language === 'en' }" @click="setLanguage('en')" title="English">EN</button>
+          <button class="theme-opt" :class="{ active: language === 'zh-CN' }" @click="setLanguage('zh-CN')" title="中文">中</button>
+        </div>
+        <div class="theme-switcher">
+          <button class="theme-opt" :class="{ active: themeMode === 'light' }" @click="setTheme('light')" title="Light">&#9788;</button>
+          <button class="theme-opt" :class="{ active: themeMode === 'system' }" @click="setTheme('system')" title="System">&#9675;</button>
+          <button class="theme-opt" :class="{ active: themeMode === 'dark' }" @click="setTheme('dark')" title="Dark">&#9790;</button>
+        </div>
       </div>
     </div>
 
     <div class="sidebar-status" :class="{ offline: !connected && !$store.app.booting }">
       <span class="status-dot"></span>
-      <span class="sidebar-label" x-show="connected" x-text="agentCount + ' agent(s) running'"></span>
-      <span class="sidebar-label" x-show="$store.app.booting && !connected" class="conn-reconnecting">Connecting...</span>
-      <span class="sidebar-label" x-show="!connected && !$store.app.booting && $store.app.connectionState === 'reconnecting'" class="conn-reconnecting">Reconnecting...</span>
-      <span class="sidebar-label" x-show="!connected && !$store.app.booting && $store.app.connectionState !== 'reconnecting'" x-text="'disconnected' + ($store.app.lastError ? ' — ' + $store.app.lastError : '')">disconnected</span>
+      <span class="sidebar-label" x-show="connected" x-text="agentCount + ' ' + t('status.connected')"></span>
+      <span class="sidebar-label" x-show="$store.app.booting && !connected" class="conn-reconnecting" x-text="t('status.connecting')"></span>
+      <span class="sidebar-label" x-show="!connected && !$store.app.booting && $store.app.connectionState === 'reconnecting'" class="conn-reconnecting" x-text="t('status.connecting')"></span>
+      <span class="sidebar-label" x-show="!connected && !$store.app.booting && $store.app.connectionState !== 'reconnecting'" x-text="t('status.disconnected') + ($store.app.lastError ? ' — ' + $store.app.lastError : '')"></span>
       <span class="conn-badge sidebar-label" :class="wsConnected ? 'ws' : 'http'" x-text="wsConnected ? 'WS' : 'HTTP'" x-show="connected"></span>
     </div>
 
@@ -43,14 +49,14 @@
       <!-- Chat — primary action -->
       <div class="nav-section" x-data="{ collapsed: false }" aria-label="Chat">
         <div class="nav-section-title" @click="collapsed = !collapsed">
-          <span class="nav-label">Chat</span>
+          <span class="nav-label" x-text="t('nav.chat')">Chat</span>
           <span class="nav-section-chevron" :style="collapsed ? '' : 'transform:rotate(90deg)'">&rsaquo;</span>
         </div>
         <template x-if="!collapsed">
           <div x-transition>
             <a class="nav-item" :class="{ active: page === 'agents' }" @click="navigate('agents')" :aria-current="page === 'agents' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-              <span class="nav-label">Chat</span>
+              <span class="nav-label" x-text="t('nav.chat')">Chat</span>
             </a>
           </div>
         </template>
@@ -59,22 +65,22 @@
       <!-- Monitor -->
       <div class="nav-section" x-data="{ collapsed: false }" aria-label="Monitor">
         <div class="nav-section-title" @click="collapsed = !collapsed">
-          <span class="nav-label">Monitor</span>
+          <span class="nav-label" x-text="t('nav.monitor')">Monitor</span>
           <span class="nav-section-chevron" :style="collapsed ? '' : 'transform:rotate(90deg)'">&rsaquo;</span>
         </div>
         <template x-if="!collapsed">
           <div x-transition>
             <a class="nav-item" :class="{ active: page === 'overview' }" @click="navigate('overview')" :aria-current="page === 'overview' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></span>
-              <span class="nav-label">Overview</span>
+              <span class="nav-label" x-text="t('nav.overview')">Overview</span>
             </a>
             <a class="nav-item" :class="{ active: page === 'analytics' }" @click="navigate('analytics')" :aria-current="page === 'analytics' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></span>
-              <span class="nav-label">Analytics</span>
+              <span class="nav-label" x-text="t('nav.analytics')">Analytics</span>
             </a>
             <a class="nav-item" :class="{ active: page === 'logs' }" @click="navigate('logs')" :aria-current="page === 'logs' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m4 17 6-6-6-6"/><path d="M12 19h8"/></svg></span>
-              <span class="nav-label">Logs</span>
+              <span class="nav-label" x-text="t('nav.logs')">Logs</span>
             </a>
           </div>
         </template>
@@ -83,18 +89,18 @@
       <!-- Agents -->
       <div class="nav-section" x-data="{ collapsed: false }" aria-label="Agents">
         <div class="nav-section-title" @click="collapsed = !collapsed">
-          <span class="nav-label">Agents</span>
+          <span class="nav-label" x-text="t('nav.agents')">Agents</span>
           <span class="nav-section-chevron" :style="collapsed ? '' : 'transform:rotate(90deg)'">&rsaquo;</span>
         </div>
         <template x-if="!collapsed">
           <div x-transition>
             <a class="nav-item" :class="{ active: page === 'sessions' }" @click="navigate('sessions')" :aria-current="page === 'sessions' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m12 2-10 5 10 5 10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg></span>
-              <span class="nav-label">Sessions</span>
+              <span class="nav-label" x-text="t('nav.sessions')">Sessions</span>
             </a>
             <a class="nav-item" :class="{ active: page === 'approvals' }" @click="navigate('approvals')" :aria-current="page === 'approvals' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></span>
-              <span class="nav-label">Approvals</span>
+              <span class="nav-label" x-text="t('nav.approvals')">Approvals</span>
             </a>
           </div>
         </template>
@@ -103,18 +109,18 @@
       <!-- Automation -->
       <div class="nav-section" x-data="{ collapsed: false }" aria-label="Automation">
         <div class="nav-section-title" @click="collapsed = !collapsed">
-          <span class="nav-label">Automation</span>
+          <span class="nav-label" x-text="t('nav.automation')">Automation</span>
           <span class="nav-section-chevron" :style="collapsed ? '' : 'transform:rotate(90deg)'">&rsaquo;</span>
         </div>
         <template x-if="!collapsed">
           <div x-transition>
             <a class="nav-item" :class="{ active: page === 'workflows' }" @click="navigate('workflows')" :aria-current="page === 'workflows' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M6 3v12M18 9a9 9 0 0 1-9 9"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/></svg></span>
-              <span class="nav-label">Workflows</span>
+              <span class="nav-label" x-text="t('nav.workflows')">Workflows</span>
             </a>
             <a class="nav-item" :class="{ active: page === 'scheduler' }" @click="navigate('scheduler')" :aria-current="page === 'scheduler' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-              <span class="nav-label">Scheduler</span>
+              <span class="nav-label" x-text="t('nav.scheduler')">Scheduler</span>
             </a>
           </div>
         </template>
@@ -123,22 +129,22 @@
       <!-- Extensions -->
       <div class="nav-section" x-data="{ collapsed: false }" aria-label="Extensions">
         <div class="nav-section-title" @click="collapsed = !collapsed">
-          <span class="nav-label">Extensions</span>
+          <span class="nav-label" x-text="t('nav.extensions')">Extensions</span>
           <span class="nav-section-chevron" :style="collapsed ? '' : 'transform:rotate(90deg)'">&rsaquo;</span>
         </div>
         <template x-if="!collapsed">
           <div x-transition>
             <a class="nav-item" :class="{ active: page === 'channels' }" @click="navigate('channels')" :aria-current="page === 'channels' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3l-2 18M16 3l-2 18"/></svg></span>
-              <span class="nav-label">Channels</span>
+              <span class="nav-label" x-text="t('nav.channels')">Channels</span>
             </a>
             <a class="nav-item" :class="{ active: page === 'skills' }" @click="navigate('skills')" :aria-current="page === 'skills' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg></span>
-              <span class="nav-label">Skills</span>
+              <span class="nav-label" x-text="t('nav.skills')">Skills</span>
             </a>
             <a class="nav-item" :class="{ active: page === 'hands' }" @click="navigate('hands')" :aria-current="page === 'hands' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v6"/><path d="M10 10.5V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.7-2.4L3.4 16a2 2 0 0 1 3.2-2.4L8 15"/></svg></span>
-              <span class="nav-label">Hands</span>
+              <span class="nav-label" x-text="t('nav.hands')">Hands</span>
             </a>
           </div>
         </template>
@@ -147,14 +153,14 @@
       <!-- System -->
       <div class="nav-section" x-data="{ collapsed: false }" aria-label="System">
         <div class="nav-section-title" @click="collapsed = !collapsed">
-          <span class="nav-label">System</span>
+          <span class="nav-label" x-text="t('nav.system')">System</span>
           <span class="nav-section-chevron" :style="collapsed ? '' : 'transform:rotate(90deg)'">&rsaquo;</span>
         </div>
         <template x-if="!collapsed">
           <div x-transition>
             <a class="nav-item" :class="{ active: page === 'settings' }" @click="navigate('settings')" :aria-current="page === 'settings' ? 'page' : false">
               <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg></span>
-              <span class="nav-label">Settings</span>
+              <span class="nav-label" x-text="t('nav.settings')">Settings</span>
             </a>
           </div>
         </template>
@@ -746,7 +752,7 @@
         <!-- MODE 2: Agent picker + Templates (no agent chatting) -->
         <div x-show="!activeChatAgent" class="chat-wrapper">
         <div class="page-header">
-          <h2>Chat</h2>
+          <h2 x-text="t('nav.chat')">Chat</h2>
           <div class="flex gap-2">
             <button class="btn btn-ghost btn-sm" x-show="agents.length" @click="openSpawnWizard()">+ New Agent</button>
             <button class="btn btn-danger btn-sm" x-show="agents.length > 1" @click="killAllAgents()">Stop All</button>
@@ -1068,7 +1074,7 @@
     <template x-if="page === 'approvals'">
       <div x-data="approvalsPage" x-init="loadData()">
         <div class="page-header">
-          <h2>Execution Approvals</h2>
+          <h2 x-text="t('page.approvals')">Execution Approvals</h2>
           <div class="flex items-center gap-2">
             <span class="badge badge-warn" x-show="pendingCount > 0" x-text="pendingCount + ' pending'"></span>
             <button class="btn btn-ghost btn-sm" @click="loadData()">Refresh</button>
@@ -1121,7 +1127,7 @@
     <template x-if="page === 'workflows'">
       <div x-data="{ wfTab: 'list' }">
         <div class="page-header">
-          <h2>Workflows</h2>
+          <h2 x-text="t('page.workflows')">Workflows</h2>
           <div class="flex gap-2">
             <button class="btn btn-ghost btn-sm" :class="{ active: wfTab === 'list' }" @click="wfTab = 'list'">List</button>
             <button class="btn btn-ghost btn-sm" :class="{ active: wfTab === 'builder' }" @click="wfTab = 'builder'">Visual Builder</button>
@@ -1487,7 +1493,7 @@
     <template x-if="page === 'scheduler'">
       <div x-data="schedulerPage()">
         <div class="page-header">
-          <h2>Scheduler</h2>
+          <h2 x-text="t('page.scheduler')">Scheduler</h2>
           <div class="flex gap-2">
             <button class="btn btn-primary btn-sm" x-show="tab === 'jobs'" @click="showCreateForm = true">+ New Job</button>
           </div>
@@ -1730,7 +1736,7 @@
     <template x-if="page === 'channels'">
       <div x-data="channelsPage">
         <div class="page-header">
-          <h2>Channels <span class="badge badge-muted" x-text="configuredCount + '/' + allChannels.length + ' configured'"></span></h2>
+          <h2 x-text="t('page.channels')">Channels <span class="badge badge-muted" x-text="configuredCount + '/' + allChannels.length + ' configured'"></span></h2>
         </div>
         <div class="page-body" x-init="loadChannels()">
           <div x-show="loading" class="loading-state"><div class="spinner"></div><span>Loading channels...</span></div>
@@ -1996,7 +2002,7 @@
     <!-- Page: Skills -->
     <template x-if="page === 'skills'">
       <div x-data="skillsPage">
-        <div class="page-header"><h2>Skills</h2></div>
+        <div class="page-header"><h2 x-text="t('page.skills')">Skills</h2></div>
         <div class="page-body" x-init="loadSkills()">
           <div class="info-card">
             <h4>Skills &amp; Ecosystem</h4>
@@ -2316,7 +2322,7 @@ args = ["-y", "@modelcontextprotocol/server-filesystem", "/path"]</pre>
     <!-- Page: Hands -->
     <template x-if="page === 'hands'">
       <div x-data="handsPage">
-        <div class="page-header"><h2>Hands</h2></div>
+        <div class="page-header"><h2 x-text="t('page.hands')">Hands</h2></div>
         <div class="page-body" x-init="loadData()">
           <div class="info-card">
             <h4>Hands &mdash; Curated Autonomous Capability Packages</h4>
@@ -2837,7 +2843,7 @@ args = ["-y", "@modelcontextprotocol/server-filesystem", "/path"]</pre>
     <!-- Page: Settings -->
     <template x-if="page === 'settings'">
       <div x-data="settingsPage">
-        <div class="page-header"><h2>Settings</h2></div>
+        <div class="page-header"><h2 x-text="t('page.settings')">Settings</h2></div>
         <div class="page-body" x-init="loadSettings()">
           <div x-show="loading" class="loading-state"><div class="spinner"></div><span>Loading settings...</span></div>
           <div x-show="!loading && loadError" class="error-state">
@@ -3866,7 +3872,7 @@ args = ["-y", "@modelcontextprotocol/server-filesystem", "/path"]</pre>
     <template x-if="page === 'logs'">
       <div x-data="logsPage">
         <div class="page-header">
-          <h2>Logs</h2>
+          <h2 x-text="t('page.logs')">Logs</h2>
           <div class="flex gap-2 items-center" x-show="tab === 'live'">
             <!-- Connection status indicator -->
             <span class="live-indicator" :class="connectionClass">
@@ -3984,7 +3990,7 @@ args = ["-y", "@modelcontextprotocol/server-filesystem", "/path"]</pre>
     <template x-if="page === 'wizard'">
       <div x-data="wizardPage">
         <div class="page-header">
-          <h2>Setup Wizard</h2>
+          <h2 x-text="t('wizard.title')">Setup Wizard</h2>
           <button class="btn btn-ghost btn-sm" @click="finishAndDismiss()">Skip Setup</button>
         </div>
         <div class="page-body" x-init="loadData()">

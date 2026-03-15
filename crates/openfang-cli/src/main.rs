@@ -18,6 +18,7 @@ use colored::Colorize;
 use openfang_api::server::read_daemon_info;
 use openfang_kernel::OpenFangKernel;
 use openfang_types::agent::{AgentId, AgentManifest};
+use openfang_types::i18n::{t, t1};
 use std::io::{self, BufRead, Write};
 use std::path::PathBuf;
 use std::sync::atomic::AtomicBool;
@@ -98,6 +99,10 @@ struct Cli {
     /// Path to config file.
     #[arg(long, global = true)]
     config: Option<PathBuf>,
+
+    /// Language for CLI messages (en, zh-CN).
+    #[arg(long, global = true, default_value = "en")]
+    lang: String,
 
     #[command(subcommand)]
     command: Option<Commands>,
@@ -748,6 +753,12 @@ fn main() {
 
     let cli = Cli::parse();
 
+    // Initialize i18n: CLI arg > env var > config > default
+    let lang = std::env::var("OPENFANG_LANG")
+        .or_else(|_| std::env::var("LANG"))
+        .unwrap_or_else(|_| cli.lang);
+    openfang_types::i18n::init_from_string(&lang);
+
     // Determine if this invocation launches a ratatui TUI.
     // TUI modes must NOT install the Ctrl+C handler (it calls process::exit
     // which bypasses ratatui::restore and leaves the terminal in raw mode).
@@ -1279,7 +1290,7 @@ fn cmd_start(config: Option<PathBuf>) {
 
     ui::banner();
     ui::blank();
-    println!("  Starting daemon...");
+    println!("  {}", t("cli.starting_daemon"));
     ui::blank();
 
     let rt = tokio::runtime::Runtime::new().unwrap();
@@ -1328,7 +1339,7 @@ fn cmd_start(config: Option<PathBuf>) {
         }
 
         ui::blank();
-        println!("  OpenFang daemon stopped.");
+        println!("  {}", t("cli.daemon_stopped"));
     });
 }
 
@@ -1437,12 +1448,13 @@ fn cmd_agent_spawn(config: Option<PathBuf>, manifest_path: PathBuf) {
                 .send(),
         );
         if body.get("agent_id").is_some() {
-            println!("Agent spawned successfully!");
-            println!("  ID:   {}", body["agent_id"].as_str().unwrap_or("?"));
-            println!("  Name: {}", body["name"].as_str().unwrap_or("?"));
+            println!("{}", t("cli.agent_spawned"));
+            println!("  {} {}", t("cli.agent_id"), body["agent_id"].as_str().unwrap_or("?"));
+            println!("  {} {}", t("cli.agent_name"), body["name"].as_str().unwrap_or("?"));
         } else {
             eprintln!(
-                "Failed to spawn agent: {}",
+                "{} {}",
+                t("cli.error"),
                 body["error"].as_str().unwrap_or("Unknown error")
             );
             std::process::exit(1);
@@ -1484,7 +1496,7 @@ fn cmd_agent_list(config: Option<PathBuf>, json: bool) {
         let agents = body.as_array();
 
         match agents {
-            Some(agents) if agents.is_empty() => println!("No agents running."),
+            Some(agents) if agents.is_empty() => println!("{}", t("cli.no_agents")),
             Some(agents) => {
                 println!(
                     "{:<38} {:<16} {:<10} {:<12} MODEL",
@@ -1558,8 +1570,8 @@ fn cmd_agent_kill(config: Option<PathBuf>, agent_id_str: &str) {
                 .delete(format!("{base}/api/agents/{agent_id_str}"))
                 .send(),
         );
-        if body.get("status").is_some() {
-            println!("Agent {agent_id_str} killed.");
+        if body.get("status").is_some_and(|s| s == "ok") {
+            println!("{}", t1("cli.agent_killed", agent_id_str));
         } else {
             eprintln!(
                 "Failed to kill agent: {}",

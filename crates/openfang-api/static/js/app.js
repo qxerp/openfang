@@ -189,6 +189,7 @@ function app() {
       if (mode === 'system') return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       return mode;
     })(),
+    language: localStorage.getItem('openfang-language') || 'en',
     sidebarCollapsed: localStorage.getItem('openfang-sidebar') === 'collapsed',
     mobileMenuOpen: false,
     connected: false,
@@ -290,6 +291,86 @@ function app() {
       var modes = ['light', 'system', 'dark'];
       var next = modes[(modes.indexOf(this.themeMode) + 1) % modes.length];
       this.setTheme(next);
+    },
+
+    setLanguage(lang) {
+      this.language = lang;
+      localStorage.setItem('openfang-language', lang);
+    },
+
+    t(key) {
+      var translations = {
+        'en': {
+          'nav.chat': 'Chat', 'nav.monitor': 'Monitor', 'nav.overview': 'Overview', 'nav.analytics': 'Analytics',
+          'nav.logs': 'Logs', 'nav.agents': 'Agents', 'nav.sessions': 'Sessions', 'nav.approvals': 'Approvals',
+          'nav.workflows': 'Workflows', 'nav.scheduler': 'Scheduler', 'nav.channels': 'Channels',
+          'nav.skills': 'Skills', 'nav.hands': 'Hands', 'nav.settings': 'Settings',
+          'nav.automation': 'Automation', 'nav.extensions': 'Extensions', 'nav.system': 'System',
+          'status.connected': 'agent(s) running', 'status.disconnected': 'disconnected', 'status.connecting': 'Connecting...',
+          'page.overview': 'Overview', 'page.agents': 'Agents', 'page.sessions': 'Sessions', 'page.analytics': 'Analytics',
+          'page.logs': 'Logs', 'page.workflows': 'Workflows', 'page.scheduler': 'Scheduler', 'page.channels': 'Channels',
+          'page.skills': 'Skills', 'page.hands': 'Hands', 'page.settings': 'Settings', 'page.approvals': 'Approvals',
+          'overview.agents_running': 'Agents Running', 'overview.your_agents': 'Your Agents', 'overview.or_new': 'Or Start a New Agent',
+          'overview.start_chatting': 'Start Chatting', 'overview.no_agents': 'No agents running', 'overview.spawn_one': 'Spawn one first.',
+          'overview.new_agent': 'New Agent', 'overview.stop_all': 'Stop All',
+          'agents.title': 'Agents', 'agents.your_agents': 'Your Agents', 'agents.new_agent': '+ New Agent',
+          'agents.stop_all': 'Stop All', 'agents.no_agents': 'No agents running.', 'agents.spawn_first': 'Spawn one first.',
+          'sessions.title': 'Sessions', 'sessions.conversation': 'Conversation Sessions', 'sessions.resume': 'Each conversation with an agent creates a session. Sessions store the full message history so you can resume conversations later, or review past interactions.',
+          'sessions.no_sessions': 'Sessions are created when you chat with agents. Start a conversation to see session history here.',
+          'sessions.no_match': 'No sessions match your filter.', 'sessions.memory': 'Agent Memory', 'sessions.memory_desc': 'Each agent has its own key-value memory store. Agents use memory to persist preferences, notes, and context between conversations.',
+          'sessions.no_memory': 'This agent has no memory entries yet.',
+          'settings.title': 'Settings', 'settings.language': 'Language', 'settings.theme': 'Theme',
+          'settings.light': 'Light', 'settings.dark': 'Dark', 'settings.system': 'System',
+          'btn.save': 'Save', 'btn.cancel': 'Cancel', 'btn.delete': 'Delete', 'btn.create': 'Create',
+          'btn.back': 'Back', 'btn.close': 'Close', 'btn.confirm': 'Confirm', 'btn.retry': 'Retry',
+          'msg.saved': 'Saved successfully', 'msg.deleted': 'Deleted successfully', 'msg.error': 'Error',
+          'wizard.title': 'Create Agent', 'wizard.skip': 'You can skip this step.', 'wizard.pick_template': 'Pick a template to get started quickly.',
+          'wizard.open_agents': 'Open Agents to start talking to your agent', 'wizard.go_agents': 'Go to Agents to create your first agent',
+          'channels.title': 'Channels', 'channels.skip': 'You can skip this step. The built-in web chat is always available from the Agents page.',
+          'network.title': 'Network Status', 'network.node': 'Node', 'network.address': 'Address', 'network.state': 'State',
+          'network.agents': 'Agents', 'network.protocol': 'Protocol', 'network.a2a_agents': 'A2A External Agents',
+          'network.no_agents': 'No external agents discovered yet.',
+          'analytics.title': 'Analytics', 'analytics.total_agents': 'Total Agents',
+          'overview.healthy': 'Healthy', 'overview.unreachable': 'Unreachable',
+          'channels.configured': 'configured',
+        },
+        'zh-CN': {
+          'nav.chat': '对话', 'nav.monitor': '监控', 'nav.overview': '概览', 'nav.analytics': '分析',
+          'nav.logs': '日志', 'nav.agents': '代理', 'nav.sessions': '会话', 'nav.approvals': '审批',
+          'nav.workflows': '工作流', 'nav.scheduler': '调度器', 'nav.channels': '通道',
+          'nav.skills': '技能', 'nav.hands': '工具', 'nav.settings': '设置',
+          'nav.automation': '自动化', 'nav.extensions': '扩展', 'nav.system': '系统',
+          'status.connected': '个代理运行中', 'status.disconnected': '未连接', 'status.connecting': '连接中...',
+          'page.overview': '概览', 'page.agents': '代理', 'page.sessions': '会话', 'page.analytics': '分析',
+          'page.logs': '日志', 'page.workflows': '工作流', 'page.scheduler': '调度器', 'page.channels': '通道',
+          'page.skills': '技能', 'page.hands': '工具', 'page.settings': '设置', 'page.approvals': '审批',
+          'overview.agents_running': '运行中的代理', 'overview.your_agents': '您的代理', 'overview.or_new': '或创建新代理',
+          'overview.start_chatting': '开始对话', 'overview.no_agents': '没有正在运行的代理', 'overview.spawn_one': '先创建一个。',
+          'overview.new_agent': '新建代理', 'overview.stop_all': '停止全部',
+          'agents.title': '代理', 'agents.your_agents': '您的代理', 'agents.new_agent': '+ 新建代理',
+          'agents.stop_all': '停止全部', 'agents.no_agents': '没有正在运行的代理。', 'agents.spawn_first': '先创建一个。',
+          'sessions.title': '会话', 'sessions.conversation': '对话会话', 'sessions.resume': '每次与代理对话都会创建一个会话。会话保存完整的消息历史，让您可以在以后恢复对话或回顾过去的互动。',
+          'sessions.no_sessions': '与代理对话时会创建会话。在此开始对话以查看会话历史。',
+          'sessions.no_match': '没有符合筛选条件的会话。', 'sessions.memory': '代理记忆', 'sessions.memory_desc': '每个代理都有自己的键值记忆存储。代理使用记忆来保存偏好、笔记和对话之间的上下文。',
+          'sessions.no_memory': '此代理还没有记忆条目。',
+          'settings.title': '设置', 'settings.language': '语言', 'settings.theme': '主题',
+          'settings.light': '浅色', 'settings.dark': '深色', 'settings.system': '跟随系统',
+          'btn.save': '保存', 'btn.cancel': '取消', 'btn.delete': '删除', 'btn.create': '创建',
+          'btn.back': '返回', 'btn.close': '关闭', 'btn.confirm': '确认', 'btn.retry': '重试',
+          'msg.saved': '保存成功', 'msg.deleted': '删除成功', 'msg.error': '错误',
+          'wizard.title': '创建代理', 'wizard.skip': '您可以跳过此步骤。', 'wizard.pick_template': '选择一个模板快速开始。',
+          'wizard.open_agents': '打开代理页面开始与您的代理对话', 'wizard.go_agents': '转到代理页面创建您的第一个代理',
+          'channels.title': '通道', 'channels.skip': '您可以跳过此步骤。内置网页聊天始终可以从代理页面访问。',
+          'network.title': '网络状态', 'network.node': '节点', 'network.address': '地址',
+          'network.state': '状态', 'network.agents': '代理', 'network.protocol': '协议',
+          'network.a2a_agents': 'A2A 外部代理', 'network.no_agents': '尚未发现外部代理。',
+          'analytics.title': '分析', 'analytics.total_agents': '代理总数',
+          'overview.healthy': '健康', 'overview.unreachable': '不可达',
+          'channels.configured': '已配置',
+        }
+      };
+      var lang = translations[this.language] || translations['en'];
+      return lang[key] || key;
     },
 
     toggleSidebar() {
